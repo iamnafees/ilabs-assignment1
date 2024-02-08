@@ -1,0 +1,39 @@
+spring:
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      # CORS-FILTER
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+
+
+      routes:
+        # AUTH-GATEWAY-ROUTES
+        - id: AUTH-SERVICE
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/api/v1/auth/user/**
+          filters:
+            - AuthenticationFilter
+
+        # ITEM-SERVICE-GATEWAY-ROUTES
+        - id: ITEM-SERVICE
+          uri: lb://ITEM-SERVICE
+          predicates:
+            - Path=/api/v1/item/**
+          filters:
+            - AuthenticationFilter
+        # CART-SERVICE-GATEWAY-ROUTES
+        - id: CART-SERVICE
+          uri: lb://CART-SERVICE
+          predicates:
+            - Path=/api/v1/cart/**
+          filters:
+          - AuthenticationFilter
